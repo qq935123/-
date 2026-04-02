@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&family=Noto+Sans+TC&display=swap" rel="stylesheet"></head>
 <meta charset="UTF-8">
 <title>🍄果實價值計算器</title>
 
 <style>
 body{
-  font-family: Arial;
+  font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
   text-align:center;
-  background:#eef7f0;
+  background:white;
 }
 
 .box{
-  background:white;
+  background:#B0E0E6;
   padding:20px;
   margin:20px auto;
   width:400px;
@@ -25,12 +25,16 @@ button{
   padding:8px;
   border-radius:10px;
   border:none;
+  font-family: inherit;
   font-size:14px;
   min-width:70px;
 }
 
 .selected{
-  box-shadow:0 0 10px gold;
+  box-shadow:
+    0 0 5px #fff,
+    0 0 10px #ffe066,
+    0 0 20px #ffd770;
   transform:scale(1.1);
 }
 
@@ -170,6 +174,41 @@ let maxWeightData = {
 let fruitSelect = document.getElementById("fruitSelect");
 
 fruitSelect.addEventListener("change", function(){
+
+  function resetAll(){
+
+    // 1️⃣清空重量
+    document.getElementById("weight").value = "";
+
+    // 2️⃣ 清空百分比
+    document.getElementById("weightPercent").innerText = "-";
+
+    // 3️⃣ 清空品質
+    selectedQuality = null;
+    document.getElementById("selectedQuality").innerText = "";
+
+    document.querySelectorAll("#qualityButtons button").forEach(btn=>{
+      btn.classList.remove("selected");
+    });
+
+    // 4️⃣ 清空天氣
+    selectedWeather = [];
+    document.getElementById("selectedList").innerText = "";
+
+    document.querySelectorAll("#weatherButtons button").forEach(btn=>{
+      btn.classList.remove("selected");
+    });
+
+    // 5️⃣ 清空結果
+    document.getElementById("result").innerText = "";
+
+    // 6️⃣ 清空最大重量
+    document.getElementById("maxWeightText").innerText = "-";
+  }
+
+  // ⭐⭐⭐ 這行是關鍵！！
+  resetAll();
+
   let fruitName = fruitSelect.options[fruitSelect.selectedIndex].text;
   
   let max = maxWeightData[fruitName];
@@ -179,8 +218,8 @@ fruitSelect.addEventListener("change", function(){
   }else{
     document.getElementById("maxWeightText").innerText = "-";
   }
-});
 
+});
 // 品質按鈕
 let qualityData = [
   {name:"普通", value:1, color:"#cccccc"},
