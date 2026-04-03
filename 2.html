@@ -6,7 +6,6 @@
 <meta charset="UTF-8">
 <title>🍄果實價值計算器</title>
 </head>
-
 <style>
 body{
   font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
@@ -38,7 +37,7 @@ body{
 }
 
 .row select {
-  width: 70%;  /* 佔 row 的一半寬度，自動隨螢幕變化 */
+  width: 50%;  /* 佔 row 的一半寬度，自動隨螢幕變化 */
   min-width: 200px; /* 最小寬度，避免太窄 */
   max-width: 350px; /* 最大寬度，避免太寬 */
 }
@@ -91,17 +90,22 @@ button{
   font-family: inherit;
 }
 
+
 /* 調整果實種類下拉選單本身的字體 */
 #fruitSelect {
+  appearance: none; /* 清除瀏覽器預設樣式 */
+  -webkit-appearance: none; /* 針對Webkit引擎（例如Chrome、Safari）清除樣式 */
   width: 50%
-  font-size: 18px;        /* 文字大小 */
+  font-size: 20px;        /* 文字大小 */
   font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;/* 字型，換成你喜歡的可愛圓滑字 */
   color: black;         /* 文字顏色 */
-  padding: 8px 10px;      /* 內邊距，讓文字不要貼邊 */
+  height: 40px; /* 設置高度 */
+  line-height: 30px; /* 行高設定 */
+  padding: 5px 10px; /* 內邊距 */
   border-radius: 15px;
 }
 #fruitSelect option {
-  font-size: 20px;
+  font-size: 16px;
   font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;/* 可愛圓滑字 */
   color: #555;
 }
