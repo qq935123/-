@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
-<head><link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&family=Noto+Sans+TC&display=swap" rel="stylesheet"></head>
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&family=Noto+Sans+TC&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
 <title>🍄果實價值計算器</title>
-
+</head>
 <style>
 body{
   font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
@@ -15,19 +17,98 @@ body{
   background:#B0E0E6;
   padding:20px;
   margin:20px auto;
-  width:400px;
+  width:92%;
+  max-width:400px;
   border-radius:15px;
   box-shadow:0 0 10px rgba(0,0,0,0.2);
 }
 
+.row {
+  display: flex;             /* 讓 label + select / input 同一行 */
+  justify-content: center;   /* 水平置中 */
+  align-items: center;       /* 垂直置中 */
+  gap: 10px;                 /* label 與 select/input 間距 */
+  margin-bottom: 10px;       /* 每行之間距 */
+}
+
+.row label {
+  white-space: nowrap;       /* 文字不換行 */
+  font-size: 20px;
+}
+
+.row select {
+  width: 50%;  /* 佔 row 的一半寬度，自動隨螢幕變化 */
+  min-width: 200px; /* 最小寬度，避免太窄 */
+  max-width: 350px; /* 最大寬度，避免太寬 */
+}
+
+.row input {
+  padding: 5px 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.row select {
+  width: 120px;              /* 可調整下拉選單寬度 */
+}
+
+.row input {
+  width: 80px;               /* 可調整輸入框寬度 */
+}
+
+button.small-btn {
+  width: auto;           /* 不撐滿 */
+  padding: 5px 10px;     /* 小尺寸 */
+  font-size: 14px;
+  min-width: 0;
+}
+#qualityButtons, #weatherButtons{
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 350px){
+  #qualityButtons, #weatherButtons{
+    gap: 4px;
+  }
+
+  button{
+    font-size: 12px;
+    padding: 8px 0;
+  aspect-ratio: 2/1;
+  }
+}
+
 button{
-  margin:5px;
-  padding:8px;
-  border-radius:10px;
+  width: 95%;
+  padding: 10px 0;
+  font-size: 14px;
+  border-radius: 15px;
   border:none;
   font-family: inherit;
-  font-size:14px;
-  min-width:70px;
+}
+
+
+/* 調整果實種類下拉選單本身的字體 */
+#fruitSelect {
+  appearance: none; /* 清除瀏覽器預設樣式 */
+  -webkit-appearance: none; /* 針對Webkit引擎（例如Chrome、Safari）清除樣式 */
+  width: 50%; 
+  font-size: 20px;        /* 文字大小 */
+  font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
+  color: #00778C;         /* 文字顏色 */
+  height: 40px; /* 設置高度 */
+  line-height: 30px; /* 行高設定 */
+  padding: 5px 10px; /* 內邊距 */
+  border-radius: 15px;
+  text-align: center; /* 水平居中 */
+}
+#fruitSelect option {
+  font-size: 16px;
+  font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;/* 可愛圓滑字 */
+  color: #555;
 }
 
 .selected{
@@ -46,7 +127,7 @@ button{
 
 input, select{
   margin:5px;
-  padding:5px;
+  padding:10px;
   width:80%;
 }
 </style>
@@ -55,67 +136,70 @@ input, select{
 <body>
 
 <div class="box">
-<h2>🍄果實價值計算器</h2>
+<h2>🍄果實價值計算器🍄</h2>
 
-<h3>果實種類</h3>
-<select id="fruitSelect">
-  <option value="0">-</option>
-  <option value="10148">仙人掌象</option>
-  <option value="50000">驚奇菇</option>
-  <option value="33000">魔鬼朝天椒</option>
-  <option value="24850">大王菊</option>
-  <option value="24850">葡萄</option>
-  <option value="5254.1">蟠桃</option>
-  <option value="4618.8">松果</option>
-  <option value="369.82">向日葵</option>
-  <option value="3698.2">向日葵-笑日葵</option>
-  <option value="11475.435">草莓-連體</option>
-  <option value="7650.29">草莓</option>
-  <option value="2151.65">奇異狗</option>
-  <option value="202.48">榴槤</option>
-  <option value="790.17">荔枝</option>
-  <option value="1645">櫻桃</option>
-  <option value="4969.02">香蕉-香蕉猴</option>
-  <option value="2484.51">香蕉</option>
-  <option value="527">石榴</option>
-  <option value="283.08">蘋果-糖葫蘆</option>
-  <option value="188.72">蘋果</option>
-  <option value="145">椰子</option>
-  <option value="25.92">南瓜-萬聖夜</option>
-  <option value="12.96">南瓜</option>
-  <option value="2550">棉花</option>
-  <option value="103.52">玉米</option>
-  <option value="2300">牽牛花</option>
-  <option value="539.35">橘子</option>
-  <option value="486.86">梨</option>
-  <option value="16.065">西瓜-方形</option>
-  <option value="10.71">西瓜</option>
-  <option value="279.72">白菜</option>
-  <option value="12.24">竹子</option>
-  <option value="430.32">黃瓜-黃瓜蛇</option>
-  <option value="215.16">黃瓜</option>
-  <option value="285">大豆</option>
-  <option value="43.54">波斯菊</option>
-  <option value="688.53">香菇</option>
-  <option value="65.16">番茄</option>
-  <option value="39.42">馬鈴薯-洋芋片</option>
-  <option value="26.28">馬鈴薯</option>
-</select>
+<div class="row">
+  <label for="fruitSelect">果實種類</label>
+  <select id="fruitSelect">
+     <option value="0">-</option>
+      <option value="10148">仙人掌象</option>
+      <option value="50000">驚奇菇</option>
+      <option value="33000">魔鬼朝天椒</option>
+      <option value="24850">大王菊</option>
+      <option value="24850">葡萄</option>
+      <option value="5254.1">蟠桃</option>
+      <option value="4618.8">松果</option>
+      <option value="369.82">向日葵</option>
+      <option value="3698.2">向日葵-笑日葵</option>
+      <option value="11475.435">草莓-連體</option>
+      <option value="7650.29">草莓</option>
+      <option value="2151.65">奇異狗</option>
+      <option value="202.48">榴槤</option>
+      <option value="790.17">荔枝</option>
+      <option value="1645">櫻桃</option>
+      <option value="4969.02">香蕉-香蕉猴</option>
+      <option value="2484.51">香蕉</option>
+      <option value="527">石榴</option>
+      <option value="283.08">蘋果-糖葫蘆</option>
+      <option value="188.72">蘋果</option>
+      <option value="145">椰子</option>
+      <option value="25.92">南瓜-萬聖夜</option>
+      <option value="12.96">南瓜</option>
+      <option value="2550">棉花</option>
+      <option value="103.52">玉米</option>
+      <option value="2300">牽牛花</option>
+      <option value="539.35">橘子</option>
+      <option value="486.86">梨</option>
+      <option value="16.065">西瓜-方形</option>
+      <option value="10.71">西瓜</option>
+      <option value="279.72">白菜</option>
+      <option value="12.24">竹子</option>
+      <option value="430.32">黃瓜-黃瓜蛇</option>
+      <option value="215.16">黃瓜</option>
+      <option value="285">大豆</option>
+      <option value="43.54">波斯菊</option>
+      <option value="688.53">香菇</option>
+      <option value="65.16">番茄</option>
+      <option value="39.42">馬鈴薯-洋芋片</option>
+      <option value="26.28">馬鈴薯</option>
+  </select>
+</div>
 
-<h3>重量</h3>
-<input type="number" id="weight" placeholder="輸入重量" min="0">
+<div class="row">
+  <label for="weight">重量</label>
+  <input type="number" id="weight" placeholder="輸入重量" min="0">
+</div>
 <p>
 🍄 最大重量：<span id="maxWeightText">-</span>
 ｜ 📊 百分比：<span id="weightPercent">-</span>
 </p>
 
-<h3>品質選擇</h3>
+<h3>品質選擇：<span id="selectedQuality"></span></h3>
 <div id="qualityButtons"></div>
-<p>已選品質：<span id="selectedQuality"></span></p>
 
 <h3>
 🌦️ 天氣詞條 
-<button onclick="resetWeather()">重選</button>
+  <button class="small-btn" onclick="resetWeather()">重選</button>
 </h3>
 <div id="weatherButtons"></div>
 <p>已選天氣：<span id="selectedList"></span></p>
@@ -123,6 +207,8 @@ input, select{
 <button onclick="calc()">計算</button>
 <div id="result"></div>
 </div>
+
+<div id="author">如有問題歡迎在DC農場群回報給我</div>
 
 <div id="author">製作by緣風</div>
 
