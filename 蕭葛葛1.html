@@ -177,7 +177,7 @@ input, select{
       <option value="12.24">竹子</option>
       <option value="430.32">黃瓜-黃瓜蛇</option>
       <option value="215.16">黃瓜</option>
-      <option value="2474.87">大豆</option>
+      <option value="2542">大豆</option>
       <option value="43.54">波斯菊</option>
       <option value="688.53">香菇</option>
       <option value="65.16">番茄</option>
@@ -405,8 +405,8 @@ function getWeather(){
 
 // 格式化數字
 function formatValue(num){
-  if(num>=1000000) return (num/1000000).toFixed(1)+"m";
-  if(num>=1000) return (num/1000).toFixed(1)+"k";
+  if(num>=1000000) return (num/1000000).toFixed(2)+"m";
+  if(num>=1000) return (num/1000).toFixed(2)+"k";
   return num.toFixed(1);
 }
 
