@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html>
-<head><link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&family=Noto+Sans+TC&display=swap" rel="stylesheet"></head>
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&family=Noto+Sans+TC&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
 <title>🍄果實價值計算器</title>
+</head>
 
 <style>
 body{
   font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
   text-align:center;
-  background:#eef7f0;
+  background:white;
 }
 
 .box{
-  background:white;
+  background:#B0E0E6;
   padding:20px;
   margin:20px auto;
   width:400px;
@@ -32,9 +35,9 @@ button{
 
 .selected{
   box-shadow:
-    0 0 5px #70FFB2,
-    0 0 10px #2CFF8F,
-    0 0 20px #00FF77;
+    0 0 5px #fff,
+    0 0 10px #ffe066,
+    0 0 20px #ffd770;
   transform:scale(1.1);
 }
 
@@ -90,11 +93,11 @@ input, select{
   <option value="486.86">梨</option>
   <option value="16.065">西瓜-方形</option>
   <option value="10.71">西瓜</option>
-  <option value="579.72">白菜</option>
+  <option value="279.72">白菜</option>
   <option value="12.24">竹子</option>
   <option value="430.32">黃瓜-黃瓜蛇</option>
   <option value="215.16">黃瓜</option>
-  <option value="285">大豆</option>
+  <option value="2542">大豆</option>
   <option value="43.54">波斯菊</option>
   <option value="688.53">香菇</option>
   <option value="65.16">番茄</option>
@@ -104,7 +107,10 @@ input, select{
 
 <h3>重量</h3>
 <input type="number" id="weight" placeholder="輸入重量" min="0">
-<p>🍄 最大重量：<span id="maxWeightText">-</span></p>
+<p>
+🍄 最大重量：<span id="maxWeightText">-</span>
+｜ 📊 百分比：<span id="weightPercent">-</span>
+</p>
 
 <h3>品質選擇</h3>
 <div id="qualityButtons"></div>
@@ -156,7 +162,7 @@ let maxWeightData = {
   "梨":13.5,
   "西瓜-方形":170,
   "西瓜":170,
-  "白菜":10.22,
+  "白菜":10.5,
   "竹子":140,
   "黃瓜-黃瓜蛇":13.5,
   "黃瓜":13.5,
@@ -176,6 +182,9 @@ fruitSelect.addEventListener("change", function(){
 
     // 1️⃣清空重量
     document.getElementById("weight").value = "";
+
+    // 2️⃣ 清空百分比
+    document.getElementById("weightPercent").innerText = "-";
 
     // 3️⃣ 清空品質
     selectedQuality = null;
@@ -214,7 +223,6 @@ fruitSelect.addEventListener("change", function(){
   }
 
 });
-
 // 品質按鈕
 let qualityData = [
   {name:"普通", value:1, color:"#cccccc"},
@@ -333,6 +341,24 @@ function calc(){
   let total = fruitValue*(weight**1.5)*quality*weather;
   document.getElementById("result").innerText = "🍄 最終價值：" + formatValue(total) + " ｜ 🌦️倍率：" + weather;
 }
+let weightInput = document.getElementById("weight");
+
+weightInput.addEventListener("input", function(){
+  let fruitName = fruitSelect.options[fruitSelect.selectedIndex].text;
+  let weight = parseFloat(weightInput.value);
+
+  let max = maxWeightData[fruitName];
+
+  if(!max || isNaN(weight) || weight <= 0){
+    document.getElementById("weightPercent").innerText = "-";
+    return;
+  }
+
+  let percent = (weight / max * 100).toFixed(1);
+
+  document.getElementById("weightPercent").innerText = percent + " %";
+});
+
 </script>
 </body>
 </html>
