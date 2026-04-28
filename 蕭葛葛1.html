@@ -397,12 +397,12 @@ Object.keys(values).forEach(name=>{
 function getWeather(){
   let list=[...selectedWeather];
   if(list.includes("冰凍")) list=list.filter(e=>"結霜"!==e);
-  if(list.includes("瓷化")) list=list.filter(e=>"陶化"!==e && e!=="灼熱");
+  if(list.includes("陶化")) list=list.filter(e=>"沙塵"!==e);
+  if(list.includes("瓷化")) list=list.filter(e=>"陶化"!==e && e!=="灼熱" && e!=="沙塵");
   let sum=0;
   list.forEach(e=>sum+=values[e]);
   return 1+sum;
 }
-
 // 格式化數字
 function formatValue(num){
   if(num>=1000000) return (num/1000000).toFixed(2)+"m";
