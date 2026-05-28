@@ -10,14 +10,18 @@
 body{
   font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
   text-align:center;
+  margin:0;
+  overflow-x:hidden; /* 🔥 禁止左右滑 */
 }
 
 .box{
   background:#A1FFCF;
   padding:20px;
   margin:20px auto;
-  width:460px;
+  width:95%;          /* 🔥 改這裡 */
+  max-width:460px;    /* 電腦維持原本大小 */
   border-radius:15px;
+  box-sizing:border-box;
 }
 
 .row{
@@ -25,13 +29,18 @@ body{
   justify-content:center;
   gap:6px;
   margin-top:10px;
-  flex-wrap:nowrap;
+  flex-wrap:nowrap; 
 }
 
 input{
-  width:70px;
+  width:18%; 
+  min-width:50px;
   text-align:center;
   font-size:12px;
+}
+
+select{
+  max-width:120px; /* 防止選單太寬 */
 }
 
 /* 異色按鈕 */
