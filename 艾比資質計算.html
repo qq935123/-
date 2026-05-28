@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&family=Noto+Sans+TC&display=swap" rel="stylesheet">
+
+<title>艾比資質計算</title>
+
+<style>
+body{
+  font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
+  text-align:center;
+  background:white;
+}
+
+/* 你的舊框框 */
+.box{
+  background:#B0E0E6;
+  padding:20px;
+  margin:20px auto;
+  width:400px;
+  border-radius:15px;
+  box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+.note{
+  background:#ffffff;
+  margin-top:20px;
+  padding:15px;
+  border-radius:10px;
+  text-align:left;
+  font-size:14px;
+  line-height:1.6;
+}
+
+.note h3{
+  margin-top:0;
+  text-align:center;
+}
+.stat{
+  margin:20px 0;
+}
+
+.label{
+  margin-bottom:5px;
+}
+
+/* 能量條區 */
+.bar-wrapper{
+  width:100%;
+  margin:auto;
+  position:relative;
+}
+
+.energy-bg{
+  width:100%;
+  height:20px;
+  background:#ddd;
+  border-radius:5px;
+  overflow:hidden;
+}
+
+.energy{
+  height:100%;
+  width:0%;
+  transition:0.2s;
+}
+
+/* 格子 */
+.grid{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:20px;
+  display:flex;
+}
+
+.cell{
+  flex:1;
+  border-right:1px solid rgba(0,0,0,0.2);
+  cursor:pointer;
+}
+
+/* 按鈕（用你舊風格） */
+button{
+  margin:5px;
+  padding:8px;
+  border-radius:10px;
+  border:none;
+  font-family: inherit;
+  font-size:14px;
+  min-width:70px;
+}
+
+#total{
+  font-size:28px;
+  color:#d35400;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2 class="title">艾比資質測試器</h2>
+  <h1>資質：<span id="total">0</span></h1>
+  <div id="container"></div>
+
+ <div class="note">
+    <h3>補充說明</h3>
+    <p>1. 血量、物攻一格資質 +0.625</p>
+    <p>2. 法攻、法防、物防一格資質 +1.25</p>
+    <p>3. 每個艾比可用 6 個資質果</p>
+    <p>4. 第19、20格需使用「至臻果」</p>
+    <p>5. 若不清楚具體幾格可用下列2種方式：</p>
+    <p>　<1>去慢慢調整格子到上方總資質分數正確</p>
+    <p>　<2>看一格提升多少能力分數，滿資質分減需減去幾倍</p>
+  </div>
+
+</div>
+<div id="author">製作by緣風</div>
+<script>
+const stats = [
+  {name:"血量", value:0, weight:0.625},
+  {name:"物攻", value:0, weight:0.625},
+  {name:"法攻", value:0, weight:1.25},
+  {name:"法防", value:0, weight:1.25},
+  {name:"物防", value:0, weight:1.25}
+];
+
+const container = document.getElementById("container");
+
+stats.forEach(stat=>{
+  let div = document.createElement("div");
+  div.className="stat";
+
+  let label = document.createElement("div");
+  label.className="label";
+
+  let wrapper = document.createElement("div");
+  wrapper.className="bar-wrapper";
+
+  let bg = document.createElement("div");
+  bg.className="energy-bg";
+
+  let energy = document.createElement("div");
+  energy.className="energy";
+
+  let grid = document.createElement("div");
+  grid.className="grid";
+
+  for(let i=0;i<20;i++){
+    let cell = document.createElement("div");
+    cell.className="cell";
+
+    cell.onclick = ()=>{
+      stat.value = i+1;
+      update();
+    };
+
+    grid.appendChild(cell);
+  }
+
+  bg.appendChild(energy);
+  wrapper.appendChild(bg);
+  wrapper.appendChild(grid);
+
+  let controls = document.createElement("div");
+
+  let minus = document.createElement("button");
+  minus.innerText="-";
+  minus.onclick = ()=>{
+    if(stat.value>0){
+      stat.value--;
+      update();
+    }
+  };
+
+  let plus = document.createElement("button");
+  plus.innerText="+";
+  plus.onclick = ()=>{
+    if(stat.value<20){
+      stat.value++;
+      update();
+    }
+  };
+
+  controls.appendChild(minus);
+  controls.appendChild(plus);
+
+  div.appendChild(label);
+  div.appendChild(wrapper);
+  div.appendChild(controls);
+
+  container.appendChild(div);
+
+  stat.label = label;
+  stat.energy = energy;
+});
+
+function update(){
+  let total = 0;
+
+  stats.forEach(stat=>{
+    stat.label.innerText = stat.name + "：" + stat.value;
+
+    let percent = (stat.value / 20) * 100;
+    stat.energy.style.width = percent + "%";
+
+    if(stat.value <= 17){
+      stat.energy.style.background = "#3399ff";
+    }
+    else if(stat.value === 18){
+      stat.energy.style.background = "#cc66ff";
+    }
+    else{
+      stat.energy.style.background =
+        "linear-gradient(to right, purple, blue, cyan, lime, yellow, orange)";
+    }
+
+    total += stat.value * stat.weight;
+  });
+
+  document.getElementById("total").innerText = total.toFixed(2);
+}
+
+update();
+</script>
+
+</body>
+</html>
