@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&family=Noto+Sans+TC&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>艾比計算器</title>
+
+<style>
+body{
+  font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
+  text-align:center;
+}
+
+.box{
+  background:#A1FFCF;
+  padding:20px;
+  margin:20px auto;
+  width:460px;
+  border-radius:15px;
+}
+
+.row{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  margin-top:10px;
+  flex-wrap:nowrap;
+}
+
+input{
+  width:70px;
+  text-align:center;
+  font-size:12px;
+}
+
+/* 異色按鈕 */
+.shiny-btn{
+  padding:5px 10px;
+  border-radius:10px;
+  border:none;
+  background:#eee;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.shiny-btn.active{
+  background:#ffd700;
+  box-shadow:
+    0 0 5px #fff,
+    0 0 10px #ffe066,
+    0 0 20px #ffd770;
+  transform:scale(1.2);
+}
+
+.result{
+  margin-top:10px;
+  font-weight:bold;
+  color:#d35400;
+}
+
+button.calc{
+  margin-top:10px;
+  padding:8px 20px;
+  border:none;
+  border-radius:10px;
+  background:#4CAF50;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+
+<div class="box">
+
+<h2>艾比數值計算</h2>
+
+<div>當前艾比數值</div>
+
+<div class="row">
+  等級 <input type="number" id="level" value="1">
+  
+  性格 
+  <select id="nature">
+    <option>穩健</option>
+    <option>大膽</option>
+    <option>蠻幹</option>
+    <option>愛冒險</option>
+    <option>機靈</option>
+    <option>急躁</option>
+    <option>有衝勁</option>
+    <option>堅定</option>
+    <option>踏實</option>
+    <option>樂天</option>
+    <option>悠閒</option>
+    <option>安靜</option>
+    <option>呆萌</option>
+  </select>
+
+ <button class="shiny-btn" id="shinyBtn" onclick="toggleShiny('shinyBtn')">異色</button>
+</div>
+
+<div class="row">
+  <input type="number" id="hp" placeholder="血量">
+  <input type="number" id="atk" placeholder="物功">
+  <input type="number" id="matk" placeholder="法功">
+  <input type="number" id="def" placeholder="物防">
+  <input type="number" id="mdef" placeholder="法防">
+</div>
+
+<div>目前資質數值</div>
+<div class="row">
+  <input type="number" id="hpIV" placeholder="生命">
+  <input type="number" id="atkIV" placeholder="物功">
+  <input type="number" id="matkIV" placeholder="法功">
+  <input type="number" id="mdefIV" placeholder="法防">
+  <input type="number" id="defIV" placeholder="物防">
+</div>
+
+<button onclick="calcBase()">計算基礎數值</button>
+
+<div class="result" id="baseResult"></div>
+
+<hr>
+
+<div>資質最大數值</div>
+<div class="row">
+  <input type="number" id="maxHpIV" placeholder="生命">
+  <input type="number" id="maxAtkIV" placeholder="物功">
+  <input type="number" id="maxMatkIV" placeholder="法功">
+  <input type="number" id="maxMdefIV" placeholder="法防">
+  <input type="number" id="maxDefIV" placeholder="物防">
+</div>
+
+<div class="row">
+  選擇等級 <input type="number" id="wildLevel" value="1">
+  
+  性格 
+  <select id="wildNature">
+    <option>穩健</option>
+    <option>大膽</option>
+    <option>蠻幹</option>
+    <option>愛冒險</option>
+    <option>機靈</option>
+    <option>急躁</option>
+    <option>有衝勁</option>
+    <option>堅定</option>
+    <option>踏實</option>
+    <option>樂天</option>
+    <option>悠閒</option>
+    <option>安靜</option>
+    <option>呆萌</option>
+  </select>
+
+ <button class="shiny-btn" id="wildShinyBtn" onclick="toggleShiny('wildShinyBtn')">異色</button>
+</div>
+
+<button onclick="calcWild()">計算野生數值</button>
+
+<div class="result" id="wildResult"></div>
+<button class="calc" onclick="clearAll()">清空紀錄</button>
+</div>
+
+<div class="box">
+  <h2>艾比傷害計算</h2>
+
+  <!-- 物傷 -->
+  <div class="row">
+    物傷：
+<input type="number" id="atk2" placeholder="我方物攻">
+<input type="number" id="def2" placeholder="對方物防">
+    <span class="result" id="pResult">= 0</span>
+  </div>
+
+  <!-- 法傷 -->
+  <div class="row">
+    法傷：
+<input type="number" id="matk2" placeholder="我方法攻">
+<input type="number" id="mdef2" placeholder="對方法防">
+    <span class="result" id="mResult">= 0</span>
+  </div>
+  </div>
+<div id="author">製作by緣風</div>
+<script>
+
+let baseStats = {};
+
+// 性格表
+const natureEffect = {
+  "穩健":{},
+  "大膽":{atk:1.1,def:0.9},
+  "蠻幹":{atk:1.1,matk:0.9},
+  "愛冒險":{atk:1.1,mdef:0.9},
+  "機靈":{matk:1.1,atk:0.9},
+  "急躁":{matk:1.1,def:0.9},
+  "有衝勁":{matk:1.1,mdef:0.9},
+  "堅定":{def:1.1,atk:0.9},
+  "踏實":{def:1.1,matk:0.9},
+  "樂天":{def:1.1,mdef:0.9},
+  "悠閒":{mdef:1.1,atk:0.9},
+  "安靜":{mdef:1.1,matk:0.9},
+  "呆萌":{mdef:1.1,def:0.9}
+};
+
+function getMultiplier(stat, nature, shiny){
+  let base = 1;
+  let eff = natureEffect[nature];
+
+  if(eff[stat]){
+    base = eff[stat];
+    if(shiny){
+      if(base > 1) base += 0.02;
+      else base -= 0.02;
+    }
+  }
+  return base;
+}
+
+// 計算等級數值
+function calcStat(base, iv, level){
+  if(level <= 30){
+    return base + iv * level;
+  }else{
+    return base + iv * level + iv * (level - 30);
+  }
+}
+
+// 反推基礎
+function calcBase(){
+  let lvl = +level.value;
+  let nature = document.getElementById("nature").value;
+  let shiny = document.getElementById("shinyBtn").classList.contains("active");
+
+  function reverse(finalVal, iv, stat){
+    let multi = getMultiplier(stat, nature, shiny);
+    let pure = finalVal / multi;
+
+    if(lvl <= 30){
+      return pure - iv * lvl;
+    }else{
+      return pure - (iv * lvl + iv * (lvl - 30));
+    }
+  }
+
+  baseStats = {
+    hp: reverse(+hp.value, +hpIV.value, "hp"),
+    atk: reverse(+atk.value, +atkIV.value, "atk"),
+    matk: reverse(+matk.value, +matkIV.value, "matk"),
+    def: reverse(+def.value, +defIV.value, "def"),
+    mdef: reverse(+mdef.value, +mdefIV.value, "mdef")
+  };
+
+  baseResult.innerHTML = `
+    基礎數值<br>
+    血量:${baseStats.hp.toFixed(2)}　
+    物功:${baseStats.atk.toFixed(2)}　
+    法功:${baseStats.matk.toFixed(2)}　
+    物防:${baseStats.def.toFixed(2)}　
+    法防:${baseStats.mdef.toFixed(2)}
+  `;
+}
+
+// 選擇計算
+function calcWild(){
+  let lvl = +wildLevel.value;
+  let nature = wildNature.value;
+ let shiny = document.getElementById("wildShinyBtn").classList.contains("active");
+
+  function calcLine(level){
+    function calc(stat, iv){
+      let val = calcStat(baseStats[stat], iv, level);
+      let multi = getMultiplier(stat, nature, shiny);
+      return (val * multi).toFixed(0);
+    }
+
+    return `
+    Lv${level}：
+    血量${calc("hp", maxHpIV.value)}　
+    物功${calc("atk", maxAtkIV.value)}　
+    法功${calc("matk", maxMatkIV.value)}　
+    物防${calc("def", maxDefIV.value)}　
+    法防${calc("mdef", maxMdefIV.value)}
+    `;
+  }
+
+  wildResult.innerHTML = `
+    ${calcLine(lvl)}<br>
+    ${calcLine(lvl-1)}<br>
+    ${calcLine(lvl-2)}
+  `;
+}
+function toggleShiny(id){
+  let btn = document.getElementById(id);
+  btn.classList.toggle("active");
+}
+function clearAll(){
+  document.querySelectorAll("input").forEach(el=>{
+    el.value = "";
+  });
+
+  document.querySelectorAll("select").forEach(el=>{
+    el.selectedIndex = 0;
+  });
+
+  document.querySelectorAll(".shiny-btn").forEach(btn=>{
+    btn.classList.remove("active");
+  });
+
+  baseResult.innerHTML = "";
+  wildResult.innerHTML = "";
+
+  baseStats = {};
+}
+function calculate(){
+
+  let atk = parseFloat(document.getElementById("atk2").value) || 0;
+  let def = parseFloat(document.getElementById("def2").value) || 0;
+
+  let matk = parseFloat(document.getElementById("matk2").value) || 0;
+  let mdef = parseFloat(document.getElementById("mdef2").value) || 0;
+
+  // 物傷
+  let physical = atk * (1 - (def / (def + 100)));
+let physicalBoost = atk * 1.1 * (1 - (def / (def + 100)));
+
+  // 法傷
+  let magic = matk * 0.6 * (1 - (mdef / (mdef + 100)));
+let magicBoost = matk * 1.1 * 0.6 * (1 - (mdef / (mdef + 100)));
+
+document.getElementById("pResult").innerText =
+  "= " + physical.toFixed(2) + " / " + physicalBoost.toFixed(2);
+document.getElementById("mResult").innerText =
+  "= " + magic.toFixed(2) + " / " + magicBoost.toFixed(2);
+}
+
+// 即時計算
+document.querySelectorAll("input").forEach(e=>{
+  e.addEventListener("input", calculate);
+});
+
+calculate();
+
+</script>
+
+</body>
+</html>
