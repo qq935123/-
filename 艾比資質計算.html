@@ -12,7 +12,7 @@
 body{
   font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
   text-align:center;
-  background:white;
+  background:#E1FFD4;
 }
 
 /* 你的舊框框 */
@@ -23,6 +23,27 @@ body{
   width:400px;
   border-radius:15px;
   box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+.calc-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:5px;
+  flex-wrap:nowrap;
+}
+
+.calc-row input{
+  width:22%;
+  padding:6px;
+  border-radius:10px;
+  border:1px solid #ccc;
+ font-size:12px;
+}
+
+#result2{
+  font-weight:bold;
+  color:#d35400;
+  min-width:60px;
 }
 .note{
   background:#ffffff;
@@ -114,9 +135,27 @@ button{
     <p>2. 法攻、法防、物防一格資質 +1.25</p>
     <p>3. 每個艾比可用 6 個資質果</p>
     <p>4. 第19、20格需使用「至臻果」</p>
-    <p>5. 若不清楚具體幾格可用下列2種方式：</p>
-    <p>　<1>去慢慢調整格子到上方總資質分數正確</p>
-    <p>　<2>看一格提升多少能力分數，滿資質分減需減去幾倍</p>
+    <p>5.下方有資質格數計算器可利用</p>
+
+    <p>提示：資質未達82無法餵到彩光</p>
+    <p>　　　資質達83以上必能餵出彩光</p>
+    <p>　　　資質達86以上能隨便餵:P</p>
+  </div>
+
+  </div>
+
+<div class="box">
+
+  <h3>資質格數計算器</h3>
+
+  <div class="calc-row">
+    <input id="now" type="number" placeholder="目前數值">
+    <input id="step" type="number" placeholder="一格增加數值">
+    <input id="max" type="number" placeholder="最大數值">
+
+    <span>=</span>
+
+    <span id="result2">0 格</span>
   </div>
 
 </div>
@@ -227,6 +266,33 @@ function update(){
 }
 
 update();
+
+const now = document.getElementById("now");
+const step = document.getElementById("step");
+const max = document.getElementById("max");
+const result2 = document.getElementById("result2");
+
+[now, step, max].forEach(input=>{
+  input.addEventListener("input", calcGrid);
+});
+
+function calcGrid(){
+  let n = parseFloat(now.value);
+  let s = parseFloat(step.value);
+  let m = parseFloat(max.value);
+
+  if(isNaN(n) || isNaN(s) || isNaN(m) || s === 0){
+    result2.innerText = "0 格";
+    return;
+  }
+
+  let grid = 20 - ((m - n) / s);
+
+  // 四捨五入
+  grid = Math.round(grid);
+
+  result2.innerText = grid + " 格";
+}
 </script>
 
 </body>
