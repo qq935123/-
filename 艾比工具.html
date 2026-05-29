@@ -33,7 +33,7 @@ body{
 .calc-row input{
   width:28%;
   min-width:90px;
-  padding:6px;
+  padding:4px 6px;
   border-radius:10px;
   border:1px solid #ccc;
  font-size:12px;
@@ -41,6 +41,7 @@ body{
 .row{
   display:flex;
   justify-content:center;
+  align-items:center;  /* 🔥 就這一行！ */
   gap:6px;
   margin-top:10px;
   flex-wrap:nowrap; 
@@ -48,7 +49,8 @@ body{
 
 input{
   width:25%; 
-  min-width:50px;
+  min-width:10px;
+  height:25px;      /* 🔥 固定高度 */
   text-align:center;
   font-size:12px;
 }
@@ -79,7 +81,8 @@ select{
 }
 
 .result{
-  margin-top:10px;
+  margin-top:0;
+  line-height:25px;
   font-weight:bold;
   color:#d35400;
 
