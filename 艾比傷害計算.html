@@ -71,7 +71,7 @@ select{
   overflow-x: auto;        /* 🔥 超出可滑動 */
   overflow-y: hidden;
 }
-}
+
 
 button.calc{
   margin-top:10px;
@@ -251,7 +251,7 @@ button.calc{
 <p>想抓什麼艾比在跟我說，我在去計算，在把資料輸入進去更新，我沒辦法把所有艾比都打進去，1是我懶，2是我只能把我有的資料打上去</p>
 <hr>
 <p>目前已更新</p>
-<p>舒芙蕾、喪喪苔球、焦火菇</p>
+<p>影蛛台、楓葉靈、霜糖蛤蜊、眠眠雲、冰山龜、焦火菇、舒芙蕾、喪喪苔球</p>
   </div>
   </div>
 
@@ -261,34 +261,6 @@ button.calc{
 
 // ===== 艾比資料庫 =====
 const abiData = {
-"火": {
-  "焦火菇": {
-    base: { hp:18, atk:14.6, matk:12.1, def:18.1, mdef:21.72 },
-    iv: { hp:44, atk:6.6, matk:4.6, mdef:2.47, def:1.97 },
-
-    snack: {
-      like: "火辣辣",
-      hate: "干巴巴"
-    },
-
-    habitat: "風歌荒漠-白&夜/海墟群島/熔心火山",
-    token: "在艾比小鎮或莊園停留一段時間"
-  }
-},
-  "草": {
-    "喪喪苔球": {
-      base: { hp:157.7, atk:15.9, matk:12.9, def:18.8, mdef:23.2 },
-      iv: { hp:55.07, atk:8.87, matk:6.2, mdef:2.53, def:2.1 },
-
-      snack: {
-        like: "苦兮兮",
-        hate: "火辣辣"
-      },
-
-      habitat: "海墟群島 / 聖輝林地-夜",
-      token: "在艾比小鎮掛機，等他鑽入地下不出來拔出他數次"
-    }
-  },
 
   "普通": {
     "舒芙雲": {
@@ -303,7 +275,100 @@ const abiData = {
       habitat: "冰爽浪浪攤",
       token: "不斷撫摸"
     }
+  },
+"水": {
+  "霜糖蛤蜊": {
+    base: { hp:120.48, atk:11.64, matk:15.17, def:17.7, mdef:21.75 },
+    iv: { hp:50.07, atk:5.9, matk:9.27, mdef:2.43, def:1.97 },
+
+    snack: {
+      like: "苦兮兮",
+      hate: "奶呼呼"
+    },
+
+    habitat: "冰爽浪浪攤",
+    token: "與其他霜糖蛤蜊待在一起會有流淚表情，一段時間掉落"
+  },
+"眠眠雲": {
+    base: { hp:150.9, atk:8.2, matk:15.9, def:15.54, mdef:23.33 },
+    iv: { hp:60.37, atk:3.97, matk:6.07, mdef:3.43, def:2.7 },
+
+    snack: {
+      like: "甜絲絲",
+      hate: "酸溜溜"
+    },
+
+    habitat: "龍源之域",
+    token: "在凌晨0點整聽悲傷歌曲後掉落"
+  },
+  "冰山龜": {
+    base: { hp:277.4, atk:8.05, matk:11.1, def:28.2, mdef:231 },
+    iv: { hp:80.97, atk:2.7, matk:3.67, mdef:6.5, def:5.2 },
+
+    snack: {
+      like: "冰涼涼",
+      hate: "肉香香"
+    },
+
+    habitat: "天樹原野",
+    token: "不斷撫摸"
+  },
+},
+"火": {
+  "楓葉靈": {
+    base: { hp:167.8, atk:10, matk:13.1, def:16.5, mdef:21.18 },
+    iv: { hp:61.6, atk:4.03, matk:5.93, mdef:3.37, def:2.8 },
+
+    snack: {
+      like: "肉香香",
+      hate: "酸溜溜"
+    },
+
+    habitat: "符語之森",
+    token: "進符語之森地圖到獲取『符文沙槌』的祭壇處掛機"
+  },
+  "焦火菇": {
+    base: { hp:18, atk:14.6, matk:12.1, def:18.1, mdef:21.72 },
+    iv: { hp:44, atk:6.6, matk:4.6, mdef:2.47, def:1.97 },
+
+    snack: {
+      like: "火辣辣",
+      hate: "干巴巴"
+    },
+
+    habitat: "風歌荒漠-晝&夜 / 海墟群島 / 熔心火山",
+    token: "在艾比小鎮或莊園停留一段時間"
+  },
+},
+  "草": {
+    "喪喪苔球": {
+      base: { hp:157.7, atk:15.9, matk:12.9, def:18.8, mdef:23.2 },
+      iv: { hp:55.07, atk:8.87, matk:6.2, mdef:2.53, def:2.1 },
+
+      snack: {
+        like: "苦兮兮",
+        hate: "火辣辣"
+      },
+
+      habitat: "海墟群島 / 聖輝林地-夜",
+      token: "在艾比小鎮掛機，等他鑽入地下不出來拔出他數次"
+    },
+  },
+"暗": {
+  "影蛛台": {
+    base: { hp:230.9, atk:15.57, matk:12.1, def:27.91, mdef:23.5 },
+    iv: { hp:65.87, atk:6.73, matk:4.6, mdef:3.4, def:4.13 },
+
+    snack: {
+      like: "冰涼涼",
+      hate: "肉香香"
+    },
+
+    habitat: "聖輝林地夜",
+    token: "晚上6點後在艾比小鎮掛機一段時間"
   }
+},
+
 };
 let currentAbi = null;
 
@@ -395,8 +460,8 @@ function loadAbiData(){
     法防:${currentAbi.iv.mdef}<br><br>
 <hr>
     出沒地：${currentAbi.habitat || "未知"}<br>
-    喜歡的零食：${currentAbi.snack?.like || "未知"}  
-    討厭的零食：${currentAbi.snack?.hate || "未知"}<br>
+    [零食]　喜歡：${currentAbi.snack?.like || "未知"} /  
+    討厭：${currentAbi.snack?.hate || "未知"}<br>
     信物：${currentAbi.token || "未知"}<br>
   `;
 }
