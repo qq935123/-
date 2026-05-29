@@ -1,0 +1,1120 @@
+<艾比工具 html>
+<html>
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&family=Noto+Sans+TC&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>艾比計算器</title>
+
+<style>
+body{
+  font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
+  text-align:center;
+  margin:0;
+  overflow-x:hidden; /* 🔥 禁止左右滑 */
+}
+
+.box{
+  background:#A1FFCF;
+  padding:20px;
+  margin:20px auto;
+  width:95%;          /* 🔥 改這裡 */
+  max-width:460px;    /* 電腦維持原本大小 */
+  border-radius:15px;
+  box-sizing:border-box;
+}
+.calc-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:5px;
+  flex-wrap:nowrap;
+}
+.calc-row input{
+  width:23%;
+  min-width:90px;
+  padding:6px;
+  border-radius:10px;
+  border:1px solid #ccc;
+ font-size:12px;
+}
+.row{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  margin-top:10px;
+  flex-wrap:nowrap; 
+}
+
+input{
+  width:18%; 
+  min-width:50px;
+  text-align:center;
+  font-size:12px;
+}
+
+select{
+  max-width:120px; /* 防止選單太寬 */
+}
+
+/* 異色按鈕 */
+.shiny-btn{
+  padding:5px 10px;
+  border-radius:10px;
+  border:none;
+  background:#eee;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.shiny-btn.active{
+  background:#ffd700;
+  box-shadow:
+    0 0 5px #fff,
+    0 0 10px #ffe066,
+    0 0 20px #ffd770;
+  transform:scale(1.2);
+}
+
+.result{
+  margin-top:10px;
+  font-weight:bold;
+  color:#d35400;
+
+  white-space: nowrap;     /* 🔥 強制一行 */
+  overflow-x: auto;        /* 🔥 超出可滑動 */
+  overflow-y: hidden;
+}
+#result2{
+  font-weight:bold;
+  color:#d35400;
+  min-width:60px;
+}
+
+button.calc{
+  margin-top:10px;
+  padding:8px 20px;
+  border:none;
+  border-radius:10px;
+  background:#4CAF50;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.note{
+  font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
+  text-align:center;
+  padding:10px;
+  background:#f8fff9;
+  border-radius:10px;
+  line-height:1.6;
+  /* 👇 加這三個 */
+  max-height: 250px;   /* 高度上限（可自己改） */
+  overflow-y: auto;    /* 超過就出現垂直捲軸 */
+  word-break: break-word;
+}
+.note2{
+  background:#ffffff;
+  margin-top:20px;
+  padding:15px;
+  border-radius:10px;
+  text-align:left;
+  font-size:14px;
+  line-height:1.6;
+}
+.note h3{
+  margin-top:0;
+  text-align:center;
+}
+.stat{
+  margin:20px 0;
+}
+
+.label{
+  margin-bottom:5px;
+}
+/* 能量條區 */
+.bar-wrapper{
+  width:100%;
+  margin:auto;
+  position:relative;
+}
+
+.energy-bg{
+  width:100%;
+  height:20px;
+  background:#ddd;
+  border-radius:5px;
+  overflow:hidden;
+}
+
+.energy{
+  height:100%;
+  width:0%;
+  transition:0.2s;
+}
+
+/* 格子 */
+.grid{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:20px;
+  display:flex;
+}
+
+.cell{
+  flex:1;
+  border-right:1px solid rgba(0,0,0,0.2);
+  cursor:pointer;
+}
+
+/* 按鈕（用你舊風格） */
+button{
+  margin:5px;
+  padding:8px;
+  border-radius:10px;
+  border:none;
+  font-family: inherit;
+  font-size:14px;
+  min-width:70px;
+}
+
+#total{
+  font-size:28px;
+  color:#d35400;
+}
+.lv-line {
+  white-space: nowrap;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box" id="abiBox">
+  <h2>📒查詢艾比數值</h2>
+<!-- 第一行 -->
+<div class="row">
+  屬性
+  <select id="typeSelect" onchange="loadAbiList()">
+    <option value="">搜尋</option>
+    <option value="普通">普通</option>
+    <option value="水">水</option>
+    <option value="火">火</option>
+    <option value="草">草</option>
+    <option value="岩">岩</option>
+    <option value="電">電</option>
+    <option value="光">光</option>
+    <option value="暗">暗</option>
+    <option value="龍">龍</option>
+  </select>
+
+  關鍵字
+  <input type="text" id="searchAbi" placeholder="輸入關鍵字..." oninput="filterAbi()">
+</div>
+
+<!-- 第二行 -->
+<div class="row">
+  選單列表
+  <select id="abiSelect" onchange="loadAbiData()"></select>
+</div>
+<div class="result" id="abiInfo"></div>
+
+<hr>
+
+
+<div>選擇捕抓區域的最高艾比等級</div>
+<div class="row">
+  選擇等級 
+<input type="number" id="wildLevel2" placeholder="輸入等級 1~40" min="1" max="40">
+  
+  性格 
+  <select id="wildNature2">
+    <option>穩健</option>
+    <option>大膽</option>
+    <option>蠻幹</option>
+    <option>愛冒險</option>
+    <option>機靈</option>
+    <option>急躁</option>
+    <option>有衝勁</option>
+    <option>堅定</option>
+    <option>踏實</option>
+    <option>樂天</option>
+    <option>悠閒</option>
+    <option>安靜</option>
+    <option>呆萌</option>
+  </select>
+
+ <button class="shiny-btn" id="wildShinyBtn" onclick="toggleShiny('wildShinyBtn')">異色</button>
+</div>
+
+<button onclick="calcWild()">計算</button>
+
+<div class="result" id="wildResult"></div>
+<button class="calc" onclick="clearAll()">清空紀錄</button>
+
+
+</div>
+
+<div class="box">
+  <h2>⚔️艾比普攻傷害計算⚔️</h2>
+<div class="row">
+  <button class="shiny-btn" id="attrBtn" onclick="toggleShiny('attrBtn'); calculate()">屬性克制</button>
+  <button class="shiny-btn" id="critBtn" onclick="toggleShiny('critBtn'); calculate()">爆擊</button>
+  
+  特性倍率
+  <input type="number" id="extraRate" placeholder="%" style="width:60px;">
+</div>
+  <!-- 物傷 -->
+  <div class="row">
+    物傷：
+<input type="number" id="atk2" placeholder="攻擊方物攻">
+<input type="number" id="def2" placeholder="防禦方物防">
+    <span class="result" id="pResult">= 0</span>
+  </div>
+
+  <!-- 法傷 -->
+  <div class="row">
+    法傷：
+<input type="number" id="matk2" placeholder="攻擊方法攻">
+<input type="number" id="mdef2" placeholder="防禦方法防">
+    <span class="result" id="mResult">= 0</span>
+</div>
+<div style="margin-top:10px;">
+  <button onclick="addRecord()">紀錄</button>
+  <button onclick="clearRecord()">清除紀錄</button>
+
+
+<div id="historyBox" style="
+  margin-top:10px;
+  padding:10px;
+  border:1px solid #ccc;
+  max-height:210px;
+  overflow-y:auto;
+  font-size:14px;
+"></div>
+  </div>
+  </div>
+
+<div class="box">
+  <h2>📕使用說明書</h2>
+ <div class="note">
+  <div>查詢艾比數值</div>
+<p>1.先從選單列表選擇要計算的艾比(可用2或3方式查詢)</p>
+<p>2.看你想找的艾比是什麼屬性，先選擇屬性，就可以在選單列表找到艾比</p>
+<p>3.也可以選擇[搜尋]，在右方關鍵字輸入艾比名字中有的字，再從選單列表點選艾比</p>
+<p>[註]若想找的艾比沒顯示出來，代表還未新增</p>
+<p>4.成功調出基礎資料後，就可以用下面去算，你遇到的艾比，滿資質的數值</p>
+<p>5.可選擇[性格]以及有無[異色]會計算出數值</p>
+<p>6.按下計算後會計算出輸入等級以下3等的資料</p>
+<p>[註]會顯示3個等級的原因是，進去探索的時候，地圖會遇到的艾比會有3個等級，方便去計算下面傷害計算</p>
+
+<hr>
+  <div>艾比普攻傷害計算</div>
+<p>1.依照艾比打出的是物傷還是法傷去填入數值</p>
+<p>2.數值可用上方資料查詢艾比數值</p>
+<p>3.若有[屬性克制]則點選按鈕</p>
+<p>4.[紀錄]按鈕可記錄當前數值方便查詢</p>
+<p>5.若測試艾比有特性影響普攻傷害，則須輸入增加%數數值</p>
+<br>
+<p>[屬性克制關係]　ps:由左讀到右就對了</p>
+<p>_水_剋_火_剋_草_剋_岩_剋_雷_剋_水</p>
+<p>光暗相剋 普通與龍屬相剋</p>
+
+<hr>
+<p>例1:如何利用傷害計算</p>
+<p>假設我要抓喪喪苔球，他是輸出，用上面的表算出你會遇到的等級，把他的物攻輸入到裡面，再把你想當木樁測試傷害的艾比防禦輸入在右邊，右邊就會自動算好實際會跳出的傷害了，通常在遊戲裡面系統會把小數點後一位四捨五入，然後這個算出來的數字，就是喪喪苔球在那個等級中物攻最高的傷害，但實際遇到可能會有例外，這個例外就是這野生艾比的特性詞條是有會影響到普攻傷害的，或是他本身有技能會有加傷害</p>
+
+<p>小技巧</p>
+<p>上面計算艾比數值，先選好正確的性格，這樣按照算出的數字去抓，基本上性格都能抓到正確的</p>
+<p>特性倍率說明:</p>
+<p>這是用在我如果要測對方防禦數值，但我用的艾比特性有會影響普攻傷害，就可以把那個數值填進去，例如[拳擊手]會讓普攻傷害上升12%，就在特性倍率那邊打"12"，就會計算出來了</p>
+
+<p>血量測量目測法</p>
+<p>也可以用上面算出來的血量值，目測抓，假如我要抓的艾比滿資質血量是1760，而艾比頭上血條上面的格子，一格是200滴血，那他的血條長度會有8.8格，不過我觀察一下，實際上在遊戲中會看到9格，他會多一小節，好像是血條尾端彎曲的"）"的這部分不是他的血量
+
+<hr>
+<p>善用表格跟花點時間測試，是有辦法測出野生艾比的4圍，另外一圍算不了的原因是，如果他普攻是物傷，那就測不出法傷，反之同理</p>
+
+<p>用這方法抓艾比，資質更能抓到好的，雖然過程速度很慢，但可以省下很多艾比球，這是做這個表單的初心</p>
+<p>想抓什麼艾比在跟我說，我在去計算，在把資料輸入進去更新，我沒辦法把所有艾比都打進去，1是我懶，2是我只能把我有的資料打上去</p>
+<hr>
+<p>目前已更新</p>
+<p>迷幻蝶、蝠運貓、森狐、躲躲熊、章魚燒、火樹仔、爆爆狐、火山龜、影蛛台、楓葉靈、霜糖蛤蜊、眠眠雲、冰山龜、焦火菇、舒芙蕾、喪喪苔球</p>
+  </div>
+  </div>
+
+<div class="box">
+  <h2 class="title">💎艾比資質計算💎</h2>
+  <h1>資質：<span id="total">0</span></h1>
+  <div id="container"></div>
+
+ <div class="note2">
+    <h3>補充說明</h3>
+    <p>1. 生命、物攻一格資質 +0.625</p>
+    <p>2. 法攻、法防、物防一格資質 +1.25</p>
+    <p>3. 每個艾比可用 6 個資質果</p>
+    <p>4. 第19、20格需使用「至臻果」</p>
+    <p>5. 每項資質有20個格</p>
+    <p>6. 下方有資質格數計算器可利用</p>
+
+    <p>提示：資質未達82無法餵到彩光</p>
+    <p>　　　資質達83以上必能餵出彩光</p>
+    <p>　　　資質達86以上能隨便餵:P</p>
+  </div>
+
+  </div>
+
+<div class="box">
+<h3>💻資質格數計算器💻</h3>
+
+  <div class="calc-row">
+    <input id="now" type="number" placeholder="目前數值">
+    <input id="step" type="number" placeholder="一格增加數值">
+    <input id="max" type="number" placeholder="最大數值">
+
+    <span>=</span>
+
+    <span id="result2">0 格</span>
+  </div>
+
+  </div>
+
+<div id="author">製作by緣風</div>
+
+<script>
+
+// ===== 艾比資料庫 =====
+const abiData = {
+
+  abis: {
+
+    "舒芙雲": {
+      types: ["普通"],
+      base: { hp:168.04, atk:9.8, matk:12.53, def:16.72, mdef:21.32 },
+      iv: { hp:61.6, atk:4.03, matk:5.8, mdef:3.37, def:2.32 },
+
+      aa: "輔助",
+      bb: "法傷",
+      cc: "機靈 / 急躁 / 有衝勁",
+
+      snack: {
+        like: "甜絲絲",
+        hate: "苦兮兮"
+      },
+
+      habitat: "冰爽浪浪攤",
+      token: "不斷撫摸"
+  },
+
+  "霜糖蛤蜊": {
+      types: ["水"],
+    base: { hp:120.48, atk:11.64, matk:15.17, def:17.7, mdef:21.75 },
+    iv: { hp:50.07, atk:5.9, matk:9.27, mdef:2.43, def:1.97 },
+
+      aa: "輸出",
+      bb: "法傷",
+      cc: "機靈 / 急躁 / 有衝勁",
+
+    snack: {
+      like: "苦兮兮",
+      hate: "奶呼呼"
+    },
+
+    habitat: "冰爽浪浪攤",
+    token: "與其他霜糖蛤蜊待在一起會有流淚表情，一段時間掉落"
+  },
+"眠眠雲": {
+      types: ["水"],
+    base: { hp:150.9, atk:8.2, matk:15.9, def:15.54, mdef:23.33 },
+    iv: { hp:60.37, atk:3.97, matk:6.07, mdef:3.43, def:2.7 },
+
+      aa: "輔助",
+      bb: "法傷",
+      cc: "機靈 / 急躁 / 有衝勁",
+
+    snack: {
+      like: "甜絲絲",
+      hate: "酸溜溜"
+    },
+
+    habitat: "龍源之域",
+    token: "在凌晨0點整聽悲傷歌曲後掉落"
+  },
+  "冰山龜": {
+      types: ["水"],
+    base: { hp:277.4, atk:8.05, matk:11.1, def:28.2, mdef:23.1 },
+    iv: { hp:80.97, atk:2.7, matk:3.67, mdef:6.5, def:5.2 },
+
+      aa: "坦克",
+      bb: "法傷",
+      cc: "悠閒 / 安靜",
+
+    snack: {
+      like: "冰涼涼",
+      hate: "肉香香"
+    },
+
+    habitat: "天樹原野",
+    token: "不斷撫摸"
+},
+  "章魚燒": {
+      types: ["火"],
+    base: { hp:165.2, atk:16.9, matk:12.7, def:23.62, mdef:20.34 },
+    iv: { hp:48.4, atk:7.4, matk:5.01, mdef:2.13, def:2.67 },
+
+      aa: "射手",
+      bb: "物傷",
+      cc: "大膽 / 蠻幹 / 愛冒險",
+
+    snack: {
+      like: "火辣辣",
+      hate: "冰涼涼"
+    },
+
+    habitat: "[商城限時購買]",
+    token: "不斷撫摸"
+},
+  "火樹仔": {
+      types: ["火"],
+    base: { hp:167.76, atk:9.48, matk:12.63, def:17.25, mdef:20.66 },
+    iv: { hp:61.6, atk:4.03, matk:5.8, mdef:3.37, def:2.8 },
+
+      aa: "輔助",
+      bb: "法傷",
+      cc: "機靈 / 急躁 / 有衝勁",
+
+    snack: {
+      like: "冰涼涼",
+      hate: "火辣辣"
+    },
+
+    habitat: "海墟群島",
+    token: "用落雷電擊一段時間"
+},
+  "爆爆狐": {
+      types: ["火"],
+    base: { hp:165.5, atk:12.1, matk:15.5, def:22.4, mdef:18.6 },
+    iv: { hp:47.2, atk:5.9, matk:8.43, mdef:1.97, def:2.43 },
+
+      aa: "輸出",
+      bb: "物傷",
+      cc: "機靈 / 急躁 / 有衝勁",
+
+    snack: {
+      like: "火辣辣",
+      hate: "甜絲絲"
+    },
+
+    habitat: "熔心山脈",
+    token: "在艾比小鎮或莊園點擊[停留]一段時間"
+},
+  "火山龜": {
+      types: ["火"],
+    base: { hp:276.48, atk:8.24, matk:11.06, def:38.48, mdef:28.28 },
+    iv: { hp:82.47, atk:2.7, matk:3.67, mdef:5.2, def:6.5 },
+
+      aa: "坦克",
+      bb: "法傷",
+      cc: "堅定 / 踏實",
+
+    snack: {
+      like: "肉香香",
+      hate: "冰涼涼"
+    },
+
+    habitat: "熔心山脈",
+    token: "在艾比小鎮或莊園不斷撫摸"
+},
+  "楓葉靈": {
+      types: ["火"],
+    base: { hp:167.8, atk:10, matk:13.1, def:16.5, mdef:21.18 },
+    iv: { hp:61.6, atk:4.03, matk:5.93, mdef:3.37, def:2.8 },
+
+      aa: "輔助",
+      bb: "法傷",
+      cc: "機靈 / 急躁 / 有衝勁",
+
+    snack: {
+      like: "肉香香",
+      hate: "酸溜溜"
+    },
+
+    habitat: "符語之森",
+    token: "進符語之森地圖到獲取『符文沙槌』的祭壇處掛機"
+  },
+  "焦火菇": {
+      types: ["火"],
+    base: { hp:180, atk:14.6, matk:12.1, def:18.1, mdef:21.72 },
+    iv: { hp:44, atk:6.6, matk:4.6, mdef:2.47, def:1.97 },
+
+      aa: "射手",
+      bb: "物傷",
+      cc: "大膽 / 蠻幹 / 愛冒險",
+
+    snack: {
+      like: "火辣辣",
+      hate: "干巴巴"
+    },
+
+    habitat: "風歌荒漠-晝&夜 / 海墟群島 / 熔心山脈",
+    token: "在艾比小鎮或莊園停留一段時間"
+},
+  "迷幻蝶": {
+      types: ["草"],
+    base: { hp:144.5, atk:10, matk:13.45, def:16.4, mdef:22.04 },
+    iv: { hp:57.5, atk:3.87, matk:5.5, mdef:3.23, def:2.63 },
+
+      aa: "輔助",
+      bb: "法傷",
+      cc: "機靈 / 急躁 / 有衝勁",
+
+    snack: {
+      like: "冰涼涼",
+      hate: "肉香香"
+    },
+
+    habitat: "天樹原野-晝&夜 / 龍源之域",
+    token: "設為農場守衛並種植[知風藍鈴]or[美夢燈籠]"
+},
+  "蝠運貓": {
+      types: ["草"],
+    base: { hp:176.16, atk:10.68, matk:13.01, def:18.19, mdef:21.72 },
+    iv: { hp:64.53, atk:4.27, matk:6.33, mdef:3.43, def:2.83 },
+
+      aa: "輸出",
+      bb: "法傷",
+      cc: "機靈 / 急躁 / 有衝勁",
+
+    snack: {
+      like: "甜絲絲",
+      hate: "苦兮兮"
+    },
+
+    habitat: "符語之森[森狐伴生暴躁頭目]+2野生點",
+    token: "不斷撫摸"
+},
+  "森狐": {
+      types: ["草"],
+    base: { hp:164.86, atk:16.86, matk:12.8, def:24.43, mdef:19.73 },
+    iv: { hp:52.43, atk:9.57, matk:6.5, mdef:2.17, def:2.67 },
+
+      aa: "輸出",
+      bb: "物傷",
+      cc: "大膽 / 蠻幹 / 愛冒險",
+
+    snack: {
+      like: "苦兮兮",
+      hate: "奶呼呼"
+    },
+
+    habitat: "符語之森[暴躁頭目]",
+    token: "和他一起玩耍幾次"
+},
+  "躲躲熊": {
+      types: ["草"],
+    base: { hp:219.7, atk:12.2, matk:14.76, def:22.1, mdef:26.84 },
+    iv: { hp:64.53, atk:5.1, matk:7.1, mdef:4.07, def:3.33 },
+
+      aa: "刺客",
+      bb: "法傷",
+      cc: "機靈 / 急躁 / 有衝勁",
+
+    snack: {
+      like: "奶呼呼",
+      hate: "火辣辣"
+    },
+
+    habitat: "盲盒出品",
+    token: "和他玩幾次捉迷藏"
+},
+    "喪喪苔球": {
+      types: ["草"],
+      base: { hp:157.7, atk:15.9, matk:12.9, def:18.8, mdef:23.2 },
+      iv: { hp:55.07, atk:8.87, matk:6.2, mdef:2.53, def:2.1 },
+
+      aa: "輸出",
+      bb: "物傷",
+      cc: "大膽 / 蠻幹 / 愛冒險",
+
+      snack: {
+        like: "苦兮兮",
+        hate: "火辣辣"
+      },
+
+      habitat: "海墟群島 / 聖輝林地-夜",
+      token: "在艾比小鎮掛機，等他鑽入地下不出來拔出他數次"
+  },
+
+  "影蛛台": {
+      types: ["暗"],
+    base: { hp:230.9, atk:15.57, matk:12.1, def:27.91, mdef:23.5 },
+    iv: { hp:65.87, atk:6.73, matk:4.6, mdef:3.4, def:4.13 },
+
+      aa: "戰士",
+      bb: "物傷",
+      cc: "大膽 / 蠻幹 / 愛冒險",
+
+    snack: {
+      like: "冰涼涼",
+      hate: "肉香香"
+    },
+
+    habitat: "聖輝林地夜",
+    token: "晚上6點後在艾比小鎮掛機一段時間"
+  }
+}
+
+};
+let currentAbi = null;
+
+function filterAbi(){
+  let keyword = document.getElementById("searchAbi").value.trim();
+  let type = document.getElementById("typeSelect").value;
+  let abiSelect = document.getElementById("abiSelect");
+
+  abiSelect.innerHTML = '<option value="">選擇艾比</option>';
+
+  Object.keys(abiData.abis).forEach(name=>{
+    let abi = abiData.abis[name];
+
+    let matchType = !type || abi.types.includes(type);
+    let matchName = name.includes(keyword);
+
+    if(matchType && matchName){
+      let opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = `${name} (${abi.types.join("/")})`;
+      abiSelect.appendChild(opt);
+    }
+  });
+}
+// ===== 載入艾比清單 =====
+function loadAbiList(){
+  let type = document.getElementById("typeSelect").value;
+  let abiSelect = document.getElementById("abiSelect");
+
+  document.getElementById("searchAbi").value = "";
+  abiSelect.innerHTML = '<option value="">選擇艾比</option>';
+
+  Object.keys(abiData.abis).forEach(name=>{
+    let abi = abiData.abis[name];
+
+    if(!type || abi.types.includes(type)){
+      let opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = `${name} (${abi.types.join("/")})`;
+      abiSelect.appendChild(opt);
+    }
+  });
+}
+// ===== 載入艾比數據 =====
+function loadAbiData(){
+
+  let name = document.getElementById("abiSelect").value;
+  if(!name) return;
+
+  currentAbi = abiData.abis[name];
+  if(!currentAbi) return;
+
+  document.getElementById("abiInfo").innerHTML = `
+    基礎數值<br>
+    血量:${currentAbi.base.hp}
+    物攻:${currentAbi.base.atk}
+    法攻:${currentAbi.base.matk}
+    物防:${currentAbi.base.def}
+    法防:${currentAbi.base.mdef}<br><br>
+
+    最大資質<br>
+    生命:${currentAbi.iv.hp}
+    物攻:${currentAbi.iv.atk}
+    法攻:${currentAbi.iv.matk}
+    物防:${currentAbi.iv.def}
+    法防:${currentAbi.iv.mdef}<br><br>
+<hr>
+    定位：${currentAbi.aa || "未知"}　
+    傷害類型：${currentAbi.bb || "未知"}<br>
+    推薦性格：${currentAbi.cc || "未知"}<br><br>
+    出沒地：${currentAbi.habitat || "未知"}<br>
+    [零食]　喜歡：${currentAbi.snack?.like || "未知"} /  
+    討厭：${currentAbi.snack?.hate || "未知"}<br>
+    信物：${currentAbi.token || "未知"}<br>
+  `;
+}
+// ===== 性格倍率 =====
+const natureEffect = {
+  "穩健":{},
+  "大膽":{atk:1.1,def:0.9},
+  "蠻幹":{atk:1.1,matk:0.9},
+  "愛冒險":{atk:1.1,mdef:0.9},
+  "機靈":{matk:1.1,atk:0.9},
+  "急躁":{matk:1.1,def:0.9},
+  "有衝勁":{matk:1.1,mdef:0.9},
+  "堅定":{def:1.1,atk:0.9},
+  "踏實":{def:1.1,matk:0.9},
+  "樂天":{def:1.1,mdef:0.9},
+  "悠閒":{mdef:1.1,atk:0.9},
+  "安靜":{mdef:1.1,matk:0.9},
+  "呆萌":{mdef:1.1,def:0.9}
+}
+
+function getMultiplier(stat, nature, shiny){
+  let base = 1;
+  let eff = natureEffect[nature] || {};
+
+  if(eff[stat]){
+    base = eff[stat];
+    if(shiny){
+      base += (base > 1) ? 0.02 : -0.02;
+    }
+  }
+  return base;
+}
+
+// ===== 等級計算 =====
+function calcStat(base, iv, level){
+  if(level <= 30){
+    return base + iv * level;
+  }else{
+    return base + iv * 30 + iv * 2 * (level - 30);
+  }
+}
+
+// ===== 野生艾比計算 =====
+function calcWild(){
+
+  if(!currentAbi){
+    alert("請先選擇艾比");
+    return;
+  }
+
+  let lvl = +document.getElementById("wildLevel2").value;
+  let nature = document.getElementById("wildNature2").value;
+  let shiny = document.getElementById("wildShinyBtn").classList.contains("active");
+
+  function calcLine(level){
+    if(level <= 0) return "";
+
+    function calc(stat){
+      let base = currentAbi.base[stat];
+      let iv = currentAbi.iv[stat];
+      let val = calcStat(base, iv, level);
+      let multi = getMultiplier(stat, nature, shiny);
+      return (val * multi).toFixed(0);
+    }
+
+    return `
+    Lv${level}：
+    血量${calc("hp")} 
+    物攻${calc("atk")} 
+    法攻${calc("matk")} 
+    物防${calc("def")} 
+    法防${calc("mdef")} 
+    `;
+  }
+
+  document.getElementById("wildResult").innerHTML = `
+    ${calcLine(lvl)}<br>
+    ${calcLine(lvl-1)}<br>
+    ${calcLine(lvl-2)}
+  `;
+}
+
+// ===== 按鈕切換 =====
+function toggleShiny(id){
+  let btn = document.getElementById(id);
+  btn.classList.toggle("active");
+}
+
+// ===== 清空 =====
+function clearAll(){
+
+  let box = document.getElementById("abiBox");
+
+  // 🔥 只清第一個BOX裡的 input
+  box.querySelectorAll("input").forEach(el => el.value = "");
+
+  // 🔥 只清第一個BOX裡的 select
+  box.querySelectorAll("select").forEach(el => el.selectedIndex = 0);
+
+  // 🔥 只清第一個BOX裡的異色按鈕
+  box.querySelectorAll(".shiny-btn").forEach(btn=>{
+    btn.classList.remove("active");
+  });
+
+  // 清第一個BOX顯示
+  document.getElementById("wildResult").innerHTML = "";
+  document.getElementById("abiInfo").innerHTML = "";
+
+  // 重置選擇
+  currentAbi = null;
+
+  loadAbiList();
+}
+
+function clearRecord() {
+  historyList = [];
+  document.getElementById("historyBox").innerHTML = "";
+}
+
+// ===== 傷害計算 =====
+function calculate(){
+
+  let atk = parseFloat(document.getElementById("atk2").value) || 0;
+  let def = parseFloat(document.getElementById("def2").value) || 0;
+
+  let matk = parseFloat(document.getElementById("matk2").value) || 0;
+  let mdef = parseFloat(document.getElementById("mdef2").value) || 0;
+
+  let physical = atk * (1 - (def / (def + 100)));
+  let magic = matk * 0.6 * (1 - (mdef / (mdef + 100)));
+
+  let totalMultiplier = 1;
+
+  if(document.getElementById("attrBtn").classList.contains("active")){
+    totalMultiplier *= 1.3;
+  }
+
+  if(document.getElementById("critBtn").classList.contains("active")){
+    totalMultiplier *= 1.5;
+  }
+
+  let extra = parseFloat(document.getElementById("extraRate").value) || 0;
+  totalMultiplier *= (1 + extra * 0.01);
+
+  physical *= totalMultiplier;
+  magic *= totalMultiplier;
+
+  document.getElementById("pResult").innerText = "= " + physical.toFixed(2);
+  document.getElementById("mResult").innerText = "= " + magic.toFixed(2);
+}
+
+// ===== 啟動 =====
+window.onload = function(){
+  document.querySelectorAll("input, .shiny-btn").forEach(e=>{
+    e.addEventListener("click", calculate);
+    e.addEventListener("input", calculate);
+  });
+
+  calculate();
+};
+
+let historyList = [];
+
+function addRecord() {
+  let text = "";
+
+  // 🔸 物傷
+  const phyResult = document.getElementById("pResult").innerText;
+  const atk = document.getElementById("atk2").value;
+  const def = document.getElementById("def2").value;
+
+  const counter = document.getElementById("attrBtn").classList.contains("active");
+  const crit = document.getElementById("critBtn").classList.contains("active");
+  const bonus = document.getElementById("extraRate").value;
+
+  if (phyResult && phyResult !== "= 0") {
+    text += `物傷:${phyResult} [${atk}攻][${def}防]`;
+
+    if (counter) text += "[克制]";
+    if (crit) text += "[爆擊]";
+    if (bonus) text += `[${bonus}%]`;
+
+    text += "<br>";
+  }
+
+  // 🔸 法傷
+  const magResult = document.getElementById("mResult").innerText;
+  const matk = document.getElementById("matk2").value;
+  const mdef = document.getElementById("mdef2").value;
+
+  if (magResult && magResult !== "= 0") {
+    text += `法傷:${magResult} [${matk}][${mdef}]`;
+
+    if (counter) text += "[克制]";
+    if (crit) text += "[爆擊]";
+    if (bonus) text += `[${bonus}%]`;
+
+    text += "<br>";
+  }
+
+  // 👉 存進歷史
+  if (text) {
+    historyList.unshift(text);
+    renderHistory();
+  }
+}
+
+//歷史紀錄
+function renderHistory() {
+  let html = "";
+
+  for (let i = 0; i < historyList.length; i++) {
+    let num = historyList.length - i; // 🔥 重點
+
+    html += `<div style="margin-bottom:10px; text-align:left;">
+      <div style="font-weight:bold; color:#555;">[紀錄${num}]</div>
+      ${historyList[i]}
+    </div>`;
+  }
+
+  document.getElementById("historyBox").innerHTML = html;
+}
+
+const input = document.getElementById("wildLevel2");
+
+input.addEventListener("focus", function () {
+  this.select();
+});
+
+input.addEventListener("input", function () {
+  let val = this.value;
+
+  if (val === "") return;
+
+  val = Number(val);
+
+  if (val > 40) this.value = 40;
+  if (val < 1) this.value = 1;
+});
+
+const stats = [
+  {name:"生命", value:0, weight:0.625},
+  {name:"物攻", value:0, weight:0.625},
+  {name:"法攻", value:0, weight:1.25},
+  {name:"法防", value:0, weight:1.25},
+  {name:"物防", value:0, weight:1.25}
+];
+
+const container = document.getElementById("container");
+
+stats.forEach(stat=>{
+  let div = document.createElement("div");
+  div.className="stat";
+
+  let label = document.createElement("div");
+  label.className="label";
+
+  let wrapper = document.createElement("div");
+  wrapper.className="bar-wrapper";
+
+  let bg = document.createElement("div");
+  bg.className="energy-bg";
+
+  let energy = document.createElement("div");
+  energy.className="energy";
+
+  let grid = document.createElement("div");
+  grid.className="grid";
+
+  for(let i=0;i<20;i++){
+    let cell = document.createElement("div");
+    cell.className="cell";
+
+    cell.onclick = ()=>{
+      stat.value = i+1;
+      update();
+    };
+
+    grid.appendChild(cell);
+  }
+
+  bg.appendChild(energy);
+  wrapper.appendChild(bg);
+  wrapper.appendChild(grid);
+
+  let controls = document.createElement("div");
+
+  let minus = document.createElement("button");
+  minus.innerText="-";
+  minus.onclick = ()=>{
+    if(stat.value>0){
+      stat.value--;
+      update();
+    }
+  };
+
+  let plus = document.createElement("button");
+  plus.innerText="+";
+  plus.onclick = ()=>{
+    if(stat.value<20){
+      stat.value++;
+      update();
+    }
+  };
+
+  controls.appendChild(minus);
+  controls.appendChild(plus);
+
+  div.appendChild(label);
+  div.appendChild(wrapper);
+  div.appendChild(controls);
+
+  container.appendChild(div);
+
+  stat.label = label;
+  stat.energy = energy;
+});
+
+function update(){
+  let total = 0;
+
+  stats.forEach(stat=>{
+    stat.label.innerText = stat.name + "：" + stat.value;
+
+    let percent = (stat.value / 20) * 100;
+    stat.energy.style.width = percent + "%";
+
+    if(stat.value <= 17){
+      stat.energy.style.background = "#3399ff";
+    }
+    else if(stat.value === 18){
+      stat.energy.style.background = "#cc66ff";
+    }
+    else{
+      stat.energy.style.background =
+        "linear-gradient(to right, purple, blue, cyan, lime, yellow, orange)";
+    }
+
+    total += stat.value * stat.weight;
+  });
+
+  document.getElementById("total").innerText = total.toFixed(2);
+}
+
+update();
+
+const now = document.getElementById("now");
+const step = document.getElementById("step");
+const max = document.getElementById("max");
+const result2 = document.getElementById("result2");
+
+[now, step, max].forEach(input=>{
+  input.addEventListener("input", calcGrid);
+});
+
+function calcGrid(){
+  let n = parseFloat(now.value);
+  let s = parseFloat(step.value);
+  let m = parseFloat(max.value);
+
+  if(isNaN(n) || isNaN(s) || isNaN(m) || s === 0){
+    result2.innerText = "0 格";
+    return;
+  }
+
+  let grid = 20 - ((m - n) / s);
+
+  // 四捨五入
+  grid = Math.round(grid);
+
+  result2.innerText = grid + " 格";
+}
+
+</script>
+</body>
+</html>
