@@ -133,7 +133,7 @@ button.calc{
 <div>選擇捕抓區域的最高艾比等級</div>
 <div class="row">
   選擇等級 
-<input type="number" id="wildLevel2" value="1" min="1" max="40">
+<input type="number" id="wildLevel2" placeholder="輸入等級 1~40" min="1" max="40">
   
   性格 
   <select id="wildNature2">
@@ -258,7 +258,7 @@ const abiData = {
         hate: "苦兮兮"
       },
 
-      habitat: "冰爽浪浪攤 / 苔原地帶",
+      habitat: "冰爽浪浪攤",
       token: "不斷撫摸"
     }
   }
@@ -559,11 +559,22 @@ function renderHistory() {
   document.getElementById("historyBox").innerHTML = html;
 }
 
-document.getElementById("wildLevel2").addEventListener("input", function () {
-  if (this.value > 40) this.value = 40;
-  if (this.value < 1) this.value = 1;
+const input = document.getElementById("wildLevel2");
+
+input.addEventListener("focus", function () {
+  this.select();
 });
 
+input.addEventListener("input", function () {
+  let val = this.value;
+
+  if (val === "") return;
+
+  val = Number(val);
+
+  if (val > 40) this.value = 40;
+  if (val < 1) this.value = 1;
+});
 </script>
 </body>
 </html>
