@@ -93,6 +93,10 @@ button.calc{
   line-height:1.6;
 }
 
+.lv-line {
+  white-space: nowrap;
+  font-size: 14px;
+}
 </style>
 </head>
 
@@ -213,6 +217,7 @@ button.calc{
 <p>4.成功調出基礎資料後，輸入下方資料</p>
 <p>5.可選擇性格以及有無異色會計算出數值</p>
 <p>6.按下計算後會計算出輸入等級以下3等的資料</p>
+<p>7.顯示數值太長需左右滑動查看</p>
 <hr>
   <div>艾比普攻傷害計算</div>
 <p>1.依照艾比打出的是物傷還是法傷去填入數值</p>
@@ -422,11 +427,11 @@ function calcWild(){
 
     return `
     Lv${level}：
-    血量${calc("hp")}　
-    物攻${calc("atk")}　
-    法攻${calc("matk")}　
-    物防${calc("def")}　
-    法防${calc("mdef")}
+    血量${calc("hp")} 
+    物攻${calc("atk")} 
+    法攻${calc("matk")} 
+    物防${calc("def")} 
+    法防${calc("mdef")} 
     `;
   }
 
