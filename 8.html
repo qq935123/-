@@ -76,7 +76,10 @@ input, select{
 <input type="text" id="fruitSearch" placeholder="🔍 搜尋果實..." oninput="filterFruits()">
 <select id="fruitSelect">
   <option value="0">-</option>
-  <option value="50300">彼岸花</option>
+  <option value="70515.85">月影梅</option>
+  <option value="46916.65">蘆薈</option>
+  <option value="46916.65">彼岸花</option>
+  <option value="8070">幻月花</option>
   <option value="10148">仙人掌象</option>
   <option value="50000">驚奇菇</option>
   <option value="33000">魔鬼朝天椒</option>
@@ -140,17 +143,19 @@ input, select{
 
 <button onclick="calc()">計算</button>
 <div id="result"></div>
+
 </div>
 <div class="box">
   <h2>🔊更新公告</h2>
  <div class="note">
 <p>1.新增品質:星空</p>
 <p>2.新增詞條:隕石、哈基米、彩塵、太陽耀班、暗霧、日蝕、流火、異彩、幻彩</p>
+<p>新增果實:月影梅、蘆薈、彼岸花、幻月花</p>
 <p>3.新增果實關鍵字搜尋功能</p>
 <hr>
 <p>果實部分後續更新，現在在玩其他遊戲，由於我更新後的果實幾乎沒有，所以手邊沒資料，若想新增什麼果實，可以加我dc，提供我最少5張不同重量的同果實，天氣詞條無所謂，我會找時間更新上去，感謝大家喜歡我做的這個</p>
 <hr>
-<p>最後更新 2026/06/29 04:30</p>
+<p>最後更新 2026/06/29 06:06</p>
  </div>
 </div>
 <div id="author">製作by緣風</div>
@@ -197,7 +202,10 @@ function filterFruits(){
 }
 
 let maxWeightData = {
+  "月影梅":3.4,
+  "蘆薈":10.2,
   "彼岸花":10.2,
+  "幻月花":23.8,
   "仙人掌象":34,
   "驚奇菇":10.2,
   "魔鬼朝天椒":10.2,
