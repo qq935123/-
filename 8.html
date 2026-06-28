@@ -52,6 +52,18 @@ input, select{
   padding:5px;
   width:80%;
 }
+.note{
+  font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
+  text-align:center;
+  padding:10px;
+  background:#f8fff9;
+  border-radius:10px;
+  line-height:1.6;
+  /* 👇 加這三個 */
+  max-height: 250px;   /* 高度上限（可自己改） */
+  overflow-y: auto;    /* 超過就出現垂直捲軸 */
+  word-break: break-word;
+}
 </style>
 </head>
 
@@ -70,7 +82,7 @@ input, select{
   <option value="24850">大王菊</option>
   <option value="24850">葡萄</option>
   <option value="5254.1">蟠桃</option>
-  <option value="4618.8">松果</option>
+  <option value="4315">松果</option>
   <option value="369.82">向日葵</option>
   <option value="3698.2">向日葵-笑日葵</option>
   <option value="11475.435">草莓-連體</option>
@@ -122,12 +134,23 @@ input, select{
 <button onclick="resetWeather()">重選</button>
 </h3>
 <div id="weatherButtons"></div>
+<div id="weatherSpecial" style="margin-top:10px;"></div>
 <p>已選天氣：<span id="selectedList"></span></p>
 
 <button onclick="calc()">計算</button>
 <div id="result"></div>
 </div>
-
+<div class="box">
+  <h2>🔊更新公告</h2>
+ <div class="note">
+<p>1.新增品質:星空</p>
+<p>2.新增詞條:隕石、彩塵、太陽耀班、暗霧、日蝕、流火、異彩、幻彩</p>
+<hr>
+<p>果實部分後續更新，現在在玩其他遊戲，由於我更新後的果實幾乎沒有，所以手邊沒資料，若想新增什麼果實，可以加我dc，提供我最少5張不同重量的同果實，天氣詞條無所謂，我會找時間更新上去，感謝大家喜歡我做的這個</p>
+<hr>
+<p>最後更新 2026/06/29 04:30</p>
+ </div>
+</div>
 <div id="author">製作by緣風</div>
 
 <script>
@@ -231,7 +254,8 @@ let qualityData = [
   {name:"銀", value:3, color:"#6ccf5f"},
   {name:"金", value:10, color:"#4da6ff"},
   {name:"水晶", value:20, color:"#ff9933"},
-  {name:"流光", value:30, color:"linear-gradient(45deg, red, orange, yellow, green, blue, purple)"}
+  {name:"流光", value:30, color:"linear-gradient(45deg, red, orange, yellow, green, blue, purple)"},
+{name:"星空", value:40, color:"linear-gradient(45deg, #b388ff, #ffffff, #8a5cff, #ffffff, #b388ff)"}
 ];
 // 重選天氣
 function resetWeather(){
@@ -274,42 +298,171 @@ let values = {
   "潮濕":1,"顫慄":1,
   "覆雪":2,"迷霧":2,"生機":2,"結霜":2,"灼熱":2,"沙塵":2,
   "落雷":3,
-  "冰凍":4,"陶化":4,
-  "彩虹":5,"螢光":5,"血月":5,"極光":5,"幽魂":5,"驚魂夜":5,
-  "星環":10,"亮晶晶":10,"瓷化":8,
-  "霓虹":18
+  "冰凍":4,"隕石":4,"陶化":4,
+  "彩虹":5,"螢光":5,"血月":5,"極光":5,"幽魂":5,"驚魂夜":5,"彩塵":5,"太陽耀班":5,"暗霧":6,
+  "星環":10,"亮晶晶":10,"瓷化":8,"日蝕":10,
+  "流火":15,"霓虹":18,
+  "異彩":1.5,"幻彩":3
 };
 
 let grayList = ["潮濕","顫慄","覆雪","迷霧","生機","結霜","灼熱","沙塵"];
-let greenList = ["落雷","冰凍","陶化"];
-let blueList = ["彩虹","螢光","血月","極光","幽魂","驚魂夜"];
-let purpleList = ["星環","亮晶晶","瓷化"];
+let greenList = ["落雷","冰凍","隕石","陶化"];
+let blueList = ["彩虹","螢光","血月","極光","幽魂","驚魂夜","彩塵","太陽耀班","暗霧"];
+let purpleList = ["星環","亮晶晶","瓷化","日蝕"];
 let rainbowList = ["霓虹"];
 
 let selectedWeather = [];
+let excludeMap = {
+  "冰凍": ["結霜"],
+  "結霜": ["冰凍"],
+
+  "陶化": ["沙塵"],
+  "沙塵": ["陶化"],
+
+  "瓷化": ["陶化", "灼熱", "沙塵"],
+  "灼熱": ["瓷化"],
+
+  "流火": ["瓷化"],
+  "瓷化": ["流火"],
+
+  "異彩": ["幻彩"],
+  "幻彩": ["異彩"]
+};
 let container = document.getElementById("weatherButtons");
+let specialContainer = document.getElementById("weatherSpecial");
+
 Object.keys(values).forEach(name=>{
   let btn = document.createElement("button");
   btn.innerText=name;
+
+  // 原本顏色分類
   if(grayList.includes(name)) btn.style.background="#bbb";
   else if(greenList.includes(name)) btn.style.background="#6ccf5f";
   else if(blueList.includes(name)) {btn.style.background="#4da6ff"; btn.style.color="white";}
   else if(purpleList.includes(name)) {btn.style.background="#a64dff"; btn.style.color="white";}
   else if(rainbowList.includes(name)) btn.style.background="linear-gradient(45deg, red, orange, yellow, green, blue, purple)";
 
-  btn.onclick = function(){
-    if(selectedWeather.includes(name)){
-      selectedWeather=selectedWeather.filter(e=>e!==name);
-      btn.classList.remove("selected");
-    }else{
-      selectedWeather.push(name);
-      btn.classList.add("selected");
+if(name === "異彩"){
+  btn.style.background = "#4da6ff";
+  btn.style.color = "white";
+}
+
+// ⭐ 流火（橘黃漸層）
+if(name === "流火"){
+btn.style.background = "linear-gradient(45deg, #FF7700, #FFF200)";
+btn.style.color = "#4a2a00";
+}
+
+// ⭐ 幻彩（橘黃「條紋相間」）
+if(name === "幻彩"){
+btn.style.background = "linear-gradient(45deg, #FF7700, #FFF200)";
+btn.style.color = "#4a2a00";
+}
+btn.onclick = function(){
+if(name === "瓷化"){
+  selectedWeather = selectedWeather.filter(e =>
+    e !== "灼熱" && e !== "沙塵" && e !== "陶化"
+  );
+}
+if(name === "沙塵" || name === "陶化"){
+  selectedWeather = selectedWeather.filter(e => e !== "瓷化");
+}
+  // ⭐⭐ 核心修正：只要點灼熱 or 太陽耀班 → 移除流火
+  if(name === "灼熱" || name === "太陽耀班"){
+    selectedWeather = selectedWeather.filter(e => e !== "流火");
+  }
+if(name === "流火"){
+  // 移除原料
+  selectedWeather = selectedWeather.filter(e =>
+    e !== "灼熱" && e !== "太陽耀班"
+  );
+}
+  let key = name;
+
+  // 1️⃣ toggle
+  if(selectedWeather.includes(key)){
+    selectedWeather = selectedWeather.filter(e => e !== key);
+  } else {
+
+    // 2️⃣ 排斥系統
+    if(excludeMap[key]){
+      excludeMap[key].forEach(conflict=>{
+        selectedWeather = selectedWeather.filter(e => e !== conflict);
+      });
     }
-    document.getElementById("selectedList").innerText=selectedWeather.join(",");
+
+    selectedWeather.push(key);
+  }
+ if(key === "灼熱" || key === "太陽耀班"){
+    selectedWeather = selectedWeather.filter(e => e !== "流火");
   }
 
-  container.appendChild(btn);
-});
+  // 2️⃣ 合成（一定要在後面）
+  autoCombine();
+  // 3️⃣ 合成系統 ⭐（你缺這行）
+  autoCombine();
+
+  // 4️⃣ UI更新（重新同步）
+  document.querySelectorAll("#weatherButtons button, #weatherSpecial button").forEach(btn=>{
+    if(selectedWeather.includes(btn.innerText)){
+      btn.classList.add("selected");
+    }else{
+      btn.classList.remove("selected");
+    }
+  });
+
+  // 5️⃣ 顯示
+  document.getElementById("selectedList").innerText =
+    selectedWeather.join(",");
+};  // ⭐ 放置位置（關鍵）
+  if(name === "異彩" || name === "幻彩"){
+    specialContainer.appendChild(btn); // 👉 最下面
+  }else{
+    container.appendChild(btn);
+  }
+});  
+
+function has(x){
+  return selectedWeather.includes(x);
+}
+
+function autoCombine(){
+
+  // 🔥 流火（優先最高）
+  if(has("太陽耀班") && has("灼熱")){
+
+    selectedWeather = selectedWeather.filter(e =>
+      e !== "太陽耀班" && e !== "灼熱"
+    );
+
+    selectedWeather.push("流火");
+  }
+
+  // 冰凍
+  if(has("潮濕") && has("結霜")){
+    selectedWeather = selectedWeather.filter(e =>
+      e !== "潮濕" && e !== "結霜"
+    );
+    selectedWeather.push("冰凍");
+  }
+
+  // 陶化
+  if(has("潮濕") && has("沙塵")){
+    selectedWeather = selectedWeather.filter(e =>
+      e !== "潮濕" && e !== "沙塵"
+    );
+    selectedWeather.push("陶化");
+  }
+
+  // 瓷化
+  if(has("陶化") && has("灼熱")){
+    selectedWeather = selectedWeather.filter(e =>
+      e !== "陶化" && e !== "灼熱"
+    );
+    selectedWeather.push("瓷化");
+  }
+  selectedWeather = [...new Set(selectedWeather)];
+}
 
 // 天氣倍率
 function getWeather(){
