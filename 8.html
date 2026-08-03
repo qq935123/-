@@ -103,6 +103,7 @@ input, select{
   <option value="145">椰子</option>
   <option value="25.92">南瓜-萬聖夜</option>
   <option value="12.96">南瓜</option>
+  <option value="235">柿子</option>
   <option value="2550">棉花</option>
   <option value="103.52">玉米</option>
   <option value="2300">牽牛花</option>
@@ -148,14 +149,13 @@ input, select{
 <div class="box">
   <h2>🔊更新公告</h2>
  <div class="note">
-<p>1.新增品質:星空</p>
-<p>2.新增詞條:隕石、哈基米、彩塵、太陽耀班、暗霧、日蝕、流火、異彩、幻彩</p>
-<p>新增果實:月影梅、蘆薈、彼岸花、幻月花</p>
-<p>3.新增果實關鍵字搜尋功能</p>
+<p>1.新增詞條:琥珀、橙鑽</p>
+<p>2.新增果實:柿子</p>
+
 <hr>
 <p>果實部分後續更新，現在在玩其他遊戲，由於我更新後的果實幾乎沒有，所以手邊沒資料，若想新增什麼果實，可以加我dc，提供我最少5張不同重量的同果實，天氣詞條無所謂，我會找時間更新上去，感謝大家喜歡我做的這個</p>
 <hr>
-<p>最後更新 2026/06/29 06:06</p>
+<p>最後更新 2026/08/04 01:30</p>
  </div>
 </div>
 <div id="author">製作by緣風</div>
@@ -229,6 +229,7 @@ let maxWeightData = {
   "椰子":42,
   "南瓜-萬聖夜":205,
   "南瓜":205,
+  "柿子":40.8,
   "棉花":5.2,
   "玉米":46.5,
   "牽牛花":5.6,
@@ -348,15 +349,15 @@ let values = {
   "覆雪":2,"迷霧":2,"生機":2,"結霜":2,"灼熱":2,"沙塵":2,
   "落雷":3,
   "冰凍":4,"隕石":4,"陶化":4,
-  "彩虹":5,"螢光":5,"血月":5,"極光":5,"幽魂":5,"驚魂夜":5,"哈基米":5,"彩塵":5,"太陽耀班":5,"暗霧":6,
+  "彩虹":5,"螢光":5,"血月":5,"極光":5,"幽魂":5,"驚魂夜":5,"哈基米":5,"彩塵":5,"太陽耀班":5,"暗霧":6,"琥珀":4,
   "星環":10,"亮晶晶":10,"瓷化":8,"日蝕":10,
-  "流火":15,"霓虹":18,
+  "流火":15,"橙鑽":18,"霓虹":18,
   "異彩":1.5,"幻彩":3
 };
 
 let grayList = ["潮濕","顫慄","覆雪","迷霧","生機","結霜","灼熱","沙塵"];
 let greenList = ["落雷","冰凍","隕石","陶化"];
-let blueList = ["彩虹","螢光","血月","極光","幽魂","驚魂夜","哈基米","彩塵","太陽耀班","暗霧"];
+let blueList = ["彩虹","螢光","血月","極光","幽魂","驚魂夜","哈基米","彩塵","太陽耀班","暗霧","琥珀"];
 let purpleList = ["星環","亮晶晶","瓷化","日蝕"];
 let rainbowList = ["霓虹"];
 
@@ -373,6 +374,12 @@ let excludeMap = {
 
   "流火": ["瓷化"],
   "瓷化": ["流火"],
+
+  "琥珀": ["生機"],
+  "生機": ["琥珀"],
+
+  "橙鑽": ["琥珀", "亮晶晶", "生機"],
+  "亮晶晶": ["橙鑽"],
 
   "異彩": ["幻彩"],
   "幻彩": ["異彩"]
@@ -397,7 +404,7 @@ if(name === "異彩"){
 }
 
 // ⭐ 流火（橘黃漸層）
-if(name === "流火"){
+if(name === "流火" || name === "橙鑽"){
 btn.style.background = "linear-gradient(45deg, #FF7700, #FFF200)";
 btn.style.color = "#4a2a00";
 }
@@ -420,6 +427,14 @@ if(name === "沙塵" || name === "陶化"){
   if(name === "灼熱" || name === "太陽耀班"){
     selectedWeather = selectedWeather.filter(e => e !== "流火");
   }
+if(name === "橙鑽"){
+  selectedWeather = selectedWeather.filter(e =>
+    e !== "琥珀" && e !== "亮晶晶" && e !== "生機"
+  );
+}
+if(name === "琥珀" || name === "亮晶晶"){
+  selectedWeather = selectedWeather.filter(e => e !== "橙鑽");
+}
 if(name === "流火"){
   // 移除原料
   selectedWeather = selectedWeather.filter(e =>
@@ -510,6 +525,20 @@ function autoCombine(){
     );
     selectedWeather.push("瓷化");
   }
+  // 琥珀
+  if(has("潮濕") && has("生機")){
+    selectedWeather = selectedWeather.filter(e =>
+      e !== "潮濕" && e !== "生機"
+    );
+    selectedWeather.push("琥珀");
+  }
+  // 橙鑽
+  if(has("琥珀") && has("亮晶晶")){
+    selectedWeather = selectedWeather.filter(e =>
+      e !== "琥珀" && e !== "亮晶晶"
+    );
+    selectedWeather.push("橙鑽");
+  }
   selectedWeather = [...new Set(selectedWeather)];
 }
 
@@ -519,6 +548,8 @@ function getWeather(){
   if(list.includes("冰凍")) list=list.filter(e=>"結霜"!==e);
   if(list.includes("陶化")) list=list.filter(e=>"沙塵"!==e);
   if(list.includes("瓷化")) list=list.filter(e=>"陶化"!==e && e!=="灼熱" && e!=="沙塵");
+  if(list.includes("琥珀")) list=list.filter(e=>"生機"!==e);
+  if(list.includes("橙鑽")) list=list.filter(e=>"琥珀"!==e && e!=="亮晶晶" && e!=="生機");
   let sum=0;
   list.forEach(e=>sum+=values[e]);
   return 1+sum;
